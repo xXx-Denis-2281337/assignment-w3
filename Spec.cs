@@ -10,37 +10,66 @@ namespace KmaOoad18.Assignments.Week3
     public class Spec
     {
         [Property]
-        public bool Reverse_Rotations(List<Color> rotations)
+        public void Reverse_Rotations(int size, int d, List<Color> rotations)
         {
-            var rubik = AdvancedRubik.Init(4);
+            if (size >= 2 && size <= 5 && d >= 1 && d <= size / 2)
+            {
+                var rubik = AdvancedRubik.Init(size);
 
-            foreach (var r in rotations)
-                rubik.RotateClockwise(r, 2);
+                foreach (var r in rotations)
+                    rubik.RotateClockwise(r, d);
 
-            var reverseRotations = new List<Color>(rotations);
-            reverseRotations.Reverse();
+                var reverseRotations = new List<Color>(rotations);
+                reverseRotations.Reverse();
 
-            foreach (var rr in reverseRotations)
-                rubik.RotateCounterClockwise(rr, 2);
+                foreach (var rr in reverseRotations)
+                    rubik.RotateCounterClockwise(rr, d);
 
-            return rubik.Solved();
+                rubik.Should().Match<AdvancedRubik>(r => r.Solved());
+            }
         }
 
         [Scenario]
-        public void Init()
-        {            
-            var rubik = AdvancedRubik.Init(5);
-            rubik.Should().Match<AdvancedRubik>(r => r.Solved());
+        public void Init(int size)
+        {
+            if (size >= 2 && size <= 5)
+            {
+                var rubik = AdvancedRubik.Init(size);
+                rubik.Should().Match<AdvancedRubik>(r => r.Solved());
+            }
+        }
+
+        [Scenario]
+        public void Scramble(int size)
+        {
+            if (size >= 2 && size <= 5)
+            {
+                var rubik = AdvancedRubik.Init(size).Scramble();
+                rubik.Should().Match<AdvancedRubik>(r => !r.Solved());
+            }
+        }
+
+        [Scenario]
+        public void RotateClockwise(int size, Color c, int d)
+        {
+            if (size >= 2 && size <= 5 && d >= 1 && d <= size / 2)
+            {
+                var rubik = AdvancedRubik.Init(5).RotateClockwise(c, d);
+                rubik.Should().Match<AdvancedRubik>(r => !r.Solved());
+            }
         }
 
         [Property]
-        public bool Idempotent_Rotations(Color c)
+        public void Idempotent_Rotations(int size, Color c, int d)
         {
-            var rubik = AdvancedRubik.Init(6);
+            if (size >= 2 && size <= 5 && d >= 1 && d <= size / 2)
+            {
+                var rubik = AdvancedRubik.Init(size);
 
-            rubik.RotateClockwise(c,1).RotateClockwise(c,1).RotateClockwise(c,1).RotateClockwise(c,1);
+                rubik.RotateClockwise(c, d).RotateClockwise(c, d).RotateClockwise(c, d).RotateClockwise(c, d);
 
-            return rubik.Solved();
+                rubik.Should().Match<AdvancedRubik>(r => r.Solved());
+            }
         }
     }
 }
